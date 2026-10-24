@@ -1,0 +1,13 @@
+# Saída da compilação (Maven e Gradle)
+target/
+build/
+out/
+*.class
+
+# Arquivos do IntelliJ
+.idea/
+*.iml
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
