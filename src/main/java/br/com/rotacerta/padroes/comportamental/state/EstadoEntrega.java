@@ -5,7 +5,7 @@ import br.com.rotacerta.excecao.TransicaoInvalidaException;
 
 /**
  * Estado de uma entrega. Toda ação é inválida por padrão; cada estado
- * concreto sobrescreve apenas as ações permitidas para ele (RN12).
+ * concreto sobrescreve apenas as ações permitidas para ele.
  *
  * @note Papel no Padrão: State (State)
  * @author Jonas

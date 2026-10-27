@@ -71,13 +71,27 @@ public class OrdemCarga {
             this.carga = carga;
         }
 
-        public Builder origem(String origem) { this.origem = origem; return this; }
-        public Builder destino(String destino) { this.destino = destino; return this; }
-        public Builder distanciaKm(double km) { this.distanciaKm = km; return this; }
-        public Builder comSeguro() { this.seguro = true; return this; }
-        public Builder comEscolta() { this.escolta = true; return this; }
-        public Builder agendarPara(String dataHora) { this.agendamento = dataHora; return this; }
-        public Builder observacoes(String texto) { this.observacoes = texto; return this; }
+        public Builder origem(String origem) {
+            this.origem = origem; return this;
+        }
+        public Builder destino(String destino) {
+            this.destino = destino; return this;
+        }
+        public Builder distanciaKm(double km) {
+            this.distanciaKm = km; return this;
+        }
+        public Builder comSeguro() {
+            this.seguro = true; return this;
+        }
+        public Builder comEscolta() {
+            this.escolta = true; return this;
+        }
+        public Builder agendarPara(String dataHora) {
+            this.agendamento = dataHora; return this;
+        }
+        public Builder observacoes(String texto) {
+            this.observacoes = texto; return this;
+        }
 
         public OrdemCarga build() {
             // TODO Douglas: validar obrigatórios (RN03) -> OrdemInvalidaException

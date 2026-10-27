@@ -13,8 +13,8 @@ import java.util.List;
  * Entrega de uma ordem de carga: guarda o status atual, o veículo, o frete
  * e o histórico, e avisa os setores interessados a cada mudança.
  *
- * @note Papel no Padrão: Context (State) e Concrete Subject (Observer)
  * @author Jonas
+ * @note Papel no Padrão: Context (State) e Concrete Subject (Observer)
  */
 public class Entrega implements SujeitoEntrega {
 
@@ -30,14 +30,33 @@ public class Entrega implements SujeitoEntrega {
     }
 
     // ---- Ações: delegam para o estado atual (State) ----
-    public void coletar() { estado.coletar(this); }
-    public void despachar() { estado.despachar(this); }
-    public void reter() { estado.reter(this); }
-    public void liberar() { estado.liberar(this); }
-    public void entregar() { estado.entregar(this); }
-    public void devolver() { estado.devolver(this); }
+    public void coletar() {
+        estado.coletar(this);
+    }
 
-    /** Chamado pelos estados concretos para trocar o estado. */
+    public void despachar() {
+        estado.despachar(this);
+    }
+
+    public void reter() {
+        estado.reter(this);
+    }
+
+    public void liberar() {
+        estado.liberar(this);
+    }
+
+    public void entregar() {
+        estado.entregar(this);
+    }
+
+    public void devolver() {
+        estado.devolver(this);
+    }
+
+    /**
+     * Chamado pelos estados concretos para trocar o estado.
+     */
     public void mudarEstado(EstadoEntrega novo) {
         // TODO Jonas: guardar nome anterior, trocar estado, registrar no histórico com data/hora (RN16),
         //             Log.padrao("STATE", ...) e notificarObservadores(anterior, novo.getNome())
@@ -60,12 +79,35 @@ public class Entrega implements SujeitoEntrega {
     }
 
     // ---- Getters e setters ----
-    public OrdemCarga getOrdem() { return ordem; }
-    public Veiculo getVeiculo() { return veiculo; }
-    public void setVeiculo(Veiculo veiculo) { this.veiculo = veiculo; }
-    public double getValorFrete() { return valorFrete; }
-    public void setValorFrete(double valorFrete) { this.valorFrete = valorFrete; }
-    public EstadoEntrega getEstado() { return estado; }
-    public List<String> getHistorico() { return Collections.unmodifiableList(historico); }
-    public List<ObservadorEntrega> getObservadores() { return Collections.unmodifiableList(observadores); }
+    public OrdemCarga getOrdem() {
+        return ordem;
+    }
+
+    public Veiculo getVeiculo() {
+        return veiculo;
+    }
+
+    public void setVeiculo(Veiculo veiculo) {
+        this.veiculo = veiculo;
+    }
+
+    public double getValorFrete() {
+        return valorFrete;
+    }
+
+    public void setValorFrete(double valorFrete) {
+        this.valorFrete = valorFrete;
+    }
+
+    public EstadoEntrega getEstado() {
+        return estado;
+    }
+
+    public List<String> getHistorico() {
+        return Collections.unmodifiableList(historico);
+    }
+
+    public List<ObservadorEntrega> getObservadores() {
+        return Collections.unmodifiableList(observadores);
+    }
 }
