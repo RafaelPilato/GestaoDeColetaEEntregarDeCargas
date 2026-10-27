@@ -13,6 +13,7 @@ public abstract class Veiculo {
     private final String placa;
 
     protected Veiculo(String placa) {
+
         this.placa = placa;
     }
 
