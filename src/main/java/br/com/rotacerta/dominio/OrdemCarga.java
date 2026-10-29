@@ -1,9 +1,15 @@
 package br.com.rotacerta.dominio;
 
 import br.com.rotacerta.dominio.carga.ItemCarga;
+import br.com.rotacerta.excecao.OrdemInvalidaException;
+import br.com.rotacerta.util.Log;
 
 /**
  * Ordem de carga imutável: só pode ser criada pelo {@link Builder}.
+ *
+ * <p>Todos os campos são final e a classe não tem setters nem construtor
+ * público, de modo que, depois de criada, a ordem não muda mais. É o objeto
+ * que o Builder entrega pronto e já validado.</p>
  *
  * @note Papel no Padrão: Product (Builder)
  * @author Douglas
@@ -48,13 +54,41 @@ public class OrdemCarga {
     public String getAgendamento() { return agendamento; }
     public String getObservacoes() { return observacoes; }
 
+    @Override
+    public String toString() {
+        return String.format("%s | %s -> %s (%.0f km)", numero, origem, destino, distanciaKm);
+    }
+
     /**
-     * Monta a ordem passo a passo e valida tudo no {@link #build()}.
+     * Monta a ordem de carga passo a passo e valida tudo no {@link #build()}.
+     *
+     * <p>A ordem tem muitos campos, vários deles opcionais. Em vez de um
+     * construtor com dez parâmetros, os dados obrigatórios entram no
+     * construtor do Builder e os opcionais em métodos encadeados. Assim a
+     * criação fica legível e existe um único lugar para validar tudo: o
+     * {@code build()}, que confere os campos obrigatórios (RN03) e aplica o
+     * seguro (RN04) e a escolta (RN05) automáticos antes de entregar a
+     * ordem pronta.</p>
+     *
+     * <p>Exemplo de uso:</p>
+     * <pre>
+     * OrdemCarga ordem = new OrdemCarga.Builder(cliente, carga)
+     *         .origem("Curitiba")
+     *         .destino("Joinville")
+     *         .distanciaKm(130)
+     *         .build();
+     * </pre>
      *
      * @note Papel no Padrão: Builder (Concrete Builder)
      * @author Douglas
      */
     public static class Builder {
+
+        /** Valor da carga acima do qual a escolta passa a ser obrigatória (RN05). */
+        private static final double LIMITE_ESCOLTA = 300_000.00;
+
+        /** Contador das ordens já criadas, usado para gerar "OC-0001", "OC-0002"... */
+        private static int sequencia = 0;
 
         private final Cliente cliente;
         private final ItemCarga carga;
@@ -93,12 +127,71 @@ public class OrdemCarga {
             this.observacoes = texto; return this;
         }
 
+        /**
+         * Valida os campos obrigatórios (RN03), aplica o seguro e a escolta
+         * automáticos (RN04 e RN05), gera o número sequencial da ordem e
+         * devolve o objeto pronto e imutável.
+         *
+         * @return a ordem de carga criada
+         * @throws OrdemInvalidaException quando falta cliente, carga, origem
+         *         ou destino, quando a carga está vazia ou quando a distância
+         *         não é maior que zero
+         */
         public OrdemCarga build() {
-            // TODO Douglas: validar obrigatórios (RN03) -> OrdemInvalidaException
-            // TODO Douglas: carga perigosa => seguro automático + Log.padrao("BUILDER", ...) (RN04)
-            // TODO Douglas: valor > R$ 300.000 => escolta automática + log (RN05)
-            // TODO Douglas: gerar número sequencial "OC-0001", "OC-0002"...
-            return new OrdemCarga(this, "OC-TODO");
+            Log.padrao("BUILDER", "Iniciando montagem da ordem para \""
+                    + (cliente == null ? "cliente não informado" : cliente.getNome()) + "\"");
+
+            validarObrigatorios();
+            aplicarRegrasAutomaticas();
+
+            // O número só é consumido depois das validações, para que uma
+            // tentativa inválida não deixe buracos na sequência.
+            sequencia++;
+            String numero = String.format("OC-%04d", sequencia);
+
+            OrdemCarga ordem = new OrdemCarga(this, numero);
+            Log.padrao("BUILDER", String.format("Ordem %s criada: %s -> %s (%.0f km)",
+                    numero, origem, destino, distanciaKm));
+            return ordem;
+        }
+
+        /** RN03: cliente, carga não vazia, origem, destino e distância maior que zero. */
+        private void validarObrigatorios() {
+            if (cliente == null) {
+                throw new OrdemInvalidaException("A ordem de carga exige um cliente.");
+            }
+            if (carga == null) {
+                throw new OrdemInvalidaException("A ordem de carga exige uma carga.");
+            }
+            // Um pallet sem itens ainda pesa a tara de 25 kg, mas não vale nada:
+            // por isso a carga vazia é identificada pelo peso e pelo valor.
+            if (carga.getPesoKg() <= 0 || carga.getValor() <= 0) {
+                throw new OrdemInvalidaException(
+                        "A carga está vazia: adicione ao menos um item com peso e valor.");
+            }
+            if (origem == null || origem.isBlank()) {
+                throw new OrdemInvalidaException("A ordem de carga exige a cidade de origem.");
+            }
+            if (destino == null || destino.isBlank()) {
+                throw new OrdemInvalidaException("A ordem de carga exige a cidade de destino.");
+            }
+            if (distanciaKm <= 0) {
+                throw new OrdemInvalidaException("A distância precisa ser maior que zero.");
+            }
+        }
+
+        /** RN04: carga perigosa exige seguro. RN05: valor alto exige escolta. */
+        private void aplicarRegrasAutomaticas() {
+            if (carga.isPerigoso() && !seguro) {
+                seguro = true;
+                Log.padrao("BUILDER", "Carga perigosa detectada: seguro adicionado automaticamente (RN04)");
+            }
+            if (carga.getValor() > LIMITE_ESCOLTA && !escolta) {
+                escolta = true;
+                Log.padrao("BUILDER", String.format(
+                        "Carga de R$ %.2f acima do limite: escolta adicionada automaticamente (RN05)",
+                        carga.getValor()));
+            }
         }
     }
 }

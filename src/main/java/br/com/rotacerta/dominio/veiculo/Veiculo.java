@@ -2,7 +2,9 @@ package br.com.rotacerta.dominio.veiculo;
 
 /**
  * Veículo de transporte criado pelas operações de transporte.
- * Subclasses previstas: Vuc, Toco e Carreta.
+ * O sistema trabalha sempre com esta abstração: quem decide qual veículo
+ * concreto ({@link Vuc}, {@link Toco} ou {@link Carreta}) será criado é a
+ * operação de transporte, por meio do seu Factory Method.
  *
  * @note Papel no Padrão: Product (Factory Method)
  * @author Douglas
