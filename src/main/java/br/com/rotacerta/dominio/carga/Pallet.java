@@ -21,6 +21,9 @@ public class Pallet implements ItemCarga {
     private final List<ItemCarga> itens = new ArrayList<>();
 
     public Pallet(String descricao) {
+        if(descricao == null || descricao.isBlank()){
+            throw new RegraNegocioException("A descrição do pallet é obrigatória.");
+        }
         this.descricao = descricao;
     }
 
