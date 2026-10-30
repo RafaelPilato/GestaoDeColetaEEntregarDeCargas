@@ -5,12 +5,15 @@ import br.com.rotacerta.excecao.TransicaoInvalidaException;
 
 /**
  * Estado Aguardando Coleta: permite somente as ações previstas no ciclo da entrega.
- * @note Papel no Padrão: Concrete State (State)
+ *
  * @author Jonas
+ * @note Papel no Padrão: Concrete State (State)
  */
 public final class AguardandoColeta implements EstadoEntrega {
     @Override
-    public String getNome() { return "Aguardando Coleta"; }
+    public String getNome() {
+        return "Aguardando Coleta";
+    }
 
     @Override
     public void coletar(Entrega entrega) {

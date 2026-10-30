@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
  * e converte em uma {@link Posicao}. Como a SatTrack não informa
  * data/hora, é usado o momento da consulta.
  *
- * @note Papel no Padrão: Adapter (Adapter)
  * @author Rafael
+ * @note Papel no Padrão: Adapter (Adapter)
  */
 
 public class SatTrackAdapter implements Rastreador {

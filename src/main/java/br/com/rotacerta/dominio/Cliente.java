@@ -19,7 +19,6 @@ public class Cliente {
         }
 
 
-
         this.nome = nome;
         this.documento = documento;
         this.email = email;
@@ -39,6 +38,6 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "Nome: " + this.nome + " (" + this.documento + ")";
+        return this.nome + " (" + this.documento + ")";
     }
 }

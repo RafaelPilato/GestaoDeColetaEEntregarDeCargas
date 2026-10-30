@@ -6,8 +6,8 @@ package br.com.rotacerta.dominio.veiculo;
  * concreto ({@link Vuc}, {@link Toco} ou {@link Carreta}) será criado é a
  * operação de transporte, por meio do seu Factory Method.
  *
- * @note Papel no Padrão: Product (Factory Method)
  * @author Douglas
+ * @note Papel no Padrão: Product (Factory Method)
  */
 
 public abstract class Veiculo {
@@ -23,7 +23,9 @@ public abstract class Veiculo {
         return placa;
     }
 
-    /** "VUC", "Toco" ou "Carreta". */
+    /**
+     * "VUC", "Toco" ou "Carreta".
+     */
     public abstract String getTipo();
 
     public abstract double getCapacidadeKg();

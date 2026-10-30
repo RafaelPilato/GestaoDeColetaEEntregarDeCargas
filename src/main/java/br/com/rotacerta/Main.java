@@ -12,6 +12,7 @@ import br.com.rotacerta.padroes.comportamental.observer.CentralMonitoramento;
 import br.com.rotacerta.padroes.comportamental.observer.NotificadorCliente;
 import br.com.rotacerta.padroes.comportamental.observer.ObservadorEntrega;
 import br.com.rotacerta.padroes.comportamental.observer.SetorFinanceiro;
+import br.com.rotacerta.padroes.comportamental.state.AguardandoColeta;
 import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoRegional;
 import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoRodoviaria;
 import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoTransporte;
@@ -109,6 +110,7 @@ public class Main {
         System.out.println(" 2. Criar pallet");
         System.out.println(" 3. Colocar item dentro de um pallet");
         System.out.println(" 4. Ver cargas montadas");
+        System.out.println(" 5. Retirar item de um pallet");
         System.out.println(" 0. Voltar");
     }
 
@@ -124,6 +126,7 @@ public class Main {
                     case 2 -> criarPallet();
                     case 3 -> colocarItemNoPallet();
                     case 4 -> exibirCargas();
+                    case 5 -> retirarItemDoPallet();
                     case 0 -> Log.info("Voltando...");
                     default -> Log.erro("Opção inválida.");
                 }
@@ -146,7 +149,7 @@ public class Main {
         Log.info("Volume \"" + descricao + "\" criado.");
     }
 
-    private static void criarPallet(){
+    private static void criarPallet() {
         String descricao = lerTexto("Insira a descrição do pallet: ");
 
         cargas.add(new Pallet(descricao));
@@ -154,18 +157,37 @@ public class Main {
         Log.info("Pallet \"" + descricao + "\" criado.");
     }
 
-    private static void exibirCargas(){
-        if(cargas.isEmpty()){
+    private static void retirarItemDoPallet() {
+        List<Pallet> pallets = new ArrayList<>();
+        for (ItemCarga carga : cargas) {
+            if (carga instanceof Pallet pallet && !pallet.getItens().isEmpty()) {
+                pallets.add(pallet);
+            }
+        }
+        if (pallets.isEmpty()) {
+            throw new RegraNegocioException("Nenhum pallet com itens para retirar.");
+        }
+
+        Pallet pallet = escolher("Escolha o pallet:", pallets);
+        ItemCarga item = escolher("Escolha o item a retirar:", pallet.getItens());
+
+        pallet.remover(item);
+        cargas.add(item);
+        Log.info("\"" + item.getDescricao() + "\" voltou para as cargas soltas.");
+    }
+
+    private static void exibirCargas() {
+        if (cargas.isEmpty()) {
             Log.info("Nenhuma carga montada.");
             return;
         }
-        for(int i=0; i < cargas.size(); i++){
-            System.out.println("[" + (i+1) + "]");
+        for (int i = 0; i < cargas.size(); i++) {
+            System.out.println("[" + (i + 1) + "]");
             cargas.get(i).exibir("  ");
         }
     }
 
-    private static void colocarItemNoPallet(){
+    private static void colocarItemNoPallet() {
         if (cargas.size() < 2) {
             Log.info("É preciso ter pelo menos 2 cargas montadas para organizar.");
             return;
@@ -274,6 +296,11 @@ public class Main {
 
     private static void alocarVeiculo() {
         Entrega entrega = escolher("Escolha a entrega:", entregaService.listar());
+
+        if (!(entrega.getEstado() instanceof AguardandoColeta)) {
+            throw new RegraNegocioException("Só é possível alocar veículo antes da coleta. Estado atual: "
+                    + entrega.getEstado().getNome() + ".");
+        }
 
         if (entrega.getVeiculo() != null
                 && !lerSimNao("A entrega já tem o veículo " + entrega.getVeiculo() + ". Deseja substituir?")) {

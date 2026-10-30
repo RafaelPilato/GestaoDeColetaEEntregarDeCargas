@@ -5,8 +5,8 @@ import br.com.rotacerta.excecao.RegraNegocioException;
 /**
  * Item avulso da carga, como uma caixa ou um tambor. Não contém outros itens.
  *
- * @note Papel no Padrão: Leaf (Composite)
  * @author Rafael
+ * @note Papel no Padrão: Leaf (Composite)
  */
 
 public class Volume implements ItemCarga {
@@ -56,5 +56,10 @@ public class Volume implements ItemCarga {
     @Override
     public void exibir(String recuo) {
         System.out.println(String.format("%s- %s | %.1f kg | R$ %.2f%s", recuo, descricao, pesoKg, valor, perigoso ? " | PERIGOSO" : ""));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%.1f kg)", descricao, pesoKg);
     }
 }

@@ -7,8 +7,8 @@ import br.com.rotacerta.dominio.veiculo.Veiculo;
  * Operação de transporte regional: cria Tocos para entregas de até 600 km
  * e até 6.000 kg, aceitando carga perigosa (RN07).
  *
- * @note Papel no Padrão: Concrete Creator (Factory Method)
  * @author Douglas
+ * @note Papel no Padrão: Concrete Creator (Factory Method)
  */
 public class OperacaoRegional extends OperacaoTransporte {
 

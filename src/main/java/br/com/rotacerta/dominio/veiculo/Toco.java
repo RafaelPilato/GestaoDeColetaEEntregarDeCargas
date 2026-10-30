@@ -5,8 +5,8 @@ package br.com.rotacerta.dominio.veiculo;
  * Capacidade de 6.000 kg, custo de R$ 4,20 por km e aceita
  * carga perigosa (RN07).
  *
- * @note Papel no Padrão: Concrete Product (Factory Method)
  * @author Douglas
+ * @note Papel no Padrão: Concrete Product (Factory Method)
  */
 public class Toco extends Veiculo {
 

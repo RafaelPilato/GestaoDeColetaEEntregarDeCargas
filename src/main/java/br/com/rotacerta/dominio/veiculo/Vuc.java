@@ -5,8 +5,8 @@ package br.com.rotacerta.dominio.veiculo;
  * Capacidade de 3.000 kg, custo de R$ 2,50 por km e não transporta
  * carga perigosa (RN06).
  *
- * @note Papel no Padrão: Concrete Product (Factory Method)
  * @author Douglas
+ * @note Papel no Padrão: Concrete Product (Factory Method)
  */
 public class Vuc extends Veiculo {
 

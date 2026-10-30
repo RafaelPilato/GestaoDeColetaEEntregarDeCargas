@@ -5,12 +5,15 @@ import br.com.rotacerta.util.Log;
 
 /**
  * Reação do setor Monitoramento às mudanças de estado da entrega conforme RN15.
- * @note Papel no Padrão: Concrete Observer (Observer)
+ *
  * @author Jonas
+ * @note Papel no Padrão: Concrete Observer (Observer)
  */
 public final class CentralMonitoramento implements ObservadorEntrega {
     @Override
-    public String getNome() { return "Monitoramento"; }
+    public String getNome() {
+        return "Monitoramento";
+    }
 
     @Override
     public void atualizar(Entrega entrega, String estadoAnterior, String estadoNovo) {

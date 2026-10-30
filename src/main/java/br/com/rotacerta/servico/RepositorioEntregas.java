@@ -1,7 +1,6 @@
 package br.com.rotacerta.servico;
 
 import br.com.rotacerta.dominio.Entrega;
-import br.com.rotacerta.excecao.RegraNegocioException;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -20,14 +19,6 @@ public class RepositorioEntregas {
 
     public void salvar(Entrega entrega) {
         entregas.put(entrega.getOrdem().getNumero(), entrega);
-    }
-
-    public Entrega buscar(String numero) {
-        Entrega entrega = entregas.get(numero.trim().toUpperCase());
-        if (entrega == null) {
-            throw new RegraNegocioException("A entrega " + numero + " não foi encontrada.");
-        }
-        return entrega;
     }
 
     public List<Entrega> listar() {

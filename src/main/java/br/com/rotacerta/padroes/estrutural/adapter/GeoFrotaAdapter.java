@@ -13,8 +13,8 @@ import java.time.ZoneId;
  * a resposta em uma {@link Posicao}: micrograus em graus, m/s em km/h
  * e epoch (segundos) em data/hora local.
  *
- * @note Papel no Padrão: Adapter (Adapter)
  * @author Rafael
+ * @note Papel no Padrão: Adapter (Adapter)
  */
 
 public class GeoFrotaAdapter implements Rastreador {

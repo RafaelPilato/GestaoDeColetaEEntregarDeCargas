@@ -21,25 +21,33 @@ import java.util.Set;
  * Bitrem, por exemplo) é escrever uma nova subclasse, sem alterar este
  * código (Open/Closed).</p>
  *
- * @note Papel no Padrão: Creator (Factory Method)
  * @author Douglas
+ * @note Papel no Padrão: Creator (Factory Method)
  */
 public abstract class OperacaoTransporte {
 
-    /** Tentativas máximas ao sortear uma placa ainda não usada. */
+    /**
+     * Tentativas máximas ao sortear uma placa ainda não usada.
+     */
     private static final int MAXIMO_TENTATIVAS_PLACA = 100;
 
     private static final Random SORTEIO = new Random();
 
-    /** Placas já emitidas, para não repetir a mesma placa em dois veículos. */
+    /**
+     * Placas já emitidas, para não repetir a mesma placa em dois veículos.
+     */
     private static final Set<String> PLACAS_EMITIDAS = new HashSet<>();
 
-    /** O Factory Method: cada subclasse cria o seu tipo de veículo. */
+    /**
+     * O Factory Method: cada subclasse cria o seu tipo de veículo.
+     */
     protected abstract Veiculo criarVeiculo();
 
     public abstract String getNome();
 
-    /** Distância máxima atendida. Use Double.MAX_VALUE para sem limite. */
+    /**
+     * Distância máxima atendida. Use Double.MAX_VALUE para sem limite.
+     */
     public abstract double getDistanciaMaximaKm();
 
     /**

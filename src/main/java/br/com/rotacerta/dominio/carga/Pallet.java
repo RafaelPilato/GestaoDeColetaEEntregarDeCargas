@@ -4,6 +4,7 @@ import br.com.rotacerta.excecao.RegraNegocioException;
 import br.com.rotacerta.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class Pallet implements ItemCarga {
     private final List<ItemCarga> itens = new ArrayList<>();
 
     public Pallet(String descricao) {
-        if(descricao == null || descricao.isBlank()){
+        if (descricao == null || descricao.isBlank()) {
             throw new RegraNegocioException("A descrição do pallet é obrigatória.");
         }
         this.descricao = descricao;
@@ -86,5 +87,14 @@ public class Pallet implements ItemCarga {
         for (ItemCarga i : itens) {
             i.exibir(recuo + "  ");
         }
+    }
+
+    public List<ItemCarga> getItens() {
+        return Collections.unmodifiableList(itens);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%.1f kg)", descricao, getPesoKg());
     }
 }

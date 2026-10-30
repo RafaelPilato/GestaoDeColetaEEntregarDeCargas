@@ -64,10 +64,6 @@ public class EntregaService {
         entrega.setValorFrete(frete);
     }
 
-    public Entrega buscar(String numero) {
-        return repositorio.buscar(numero);
-    }
-
     public List<Entrega> listar() {
         return repositorio.listar();
     }

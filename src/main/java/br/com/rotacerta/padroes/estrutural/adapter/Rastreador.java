@@ -7,13 +7,15 @@ import br.com.rotacerta.dominio.Posicao;
  * O sistema só conhece esta interface, sem saber qual fornecedor
  * está por trás nem em que formato ele responde.
  *
- * @note Papel no Padrão: Target (Adapter)
  * @author Rafael
+ * @note Papel no Padrão: Target (Adapter)
  */
 
 public interface Rastreador {
 
-    /** Nome do fornecedor de rastreamento, exibido no menu. */
+    /**
+     * Nome do fornecedor de rastreamento, exibido no menu.
+     */
     String getFornecedor();
 
     /**

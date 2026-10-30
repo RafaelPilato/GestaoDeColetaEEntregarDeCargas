@@ -4,12 +4,15 @@ import br.com.rotacerta.dominio.Entrega;
 
 /**
  * Estado Coletada: permite somente as ações previstas no ciclo da entrega.
- * @note Papel no Padrão: Concrete State (State)
+ *
  * @author Jonas
+ * @note Papel no Padrão: Concrete State (State)
  */
 public final class Coletada implements EstadoEntrega {
     @Override
-    public String getNome() { return "Coletada"; }
+    public String getNome() {
+        return "Coletada";
+    }
 
     @Override
     public void despachar(Entrega entrega) {

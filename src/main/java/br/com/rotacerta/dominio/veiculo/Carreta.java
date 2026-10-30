@@ -5,8 +5,8 @@ package br.com.rotacerta.dominio.veiculo;
  * Capacidade de 30.000 kg, custo de R$ 6,80 por km e aceita
  * carga perigosa (RN08).
  *
- * @note Papel no Padrão: Concrete Product (Factory Method)
  * @author Douglas
+ * @note Papel no Padrão: Concrete Product (Factory Method)
  */
 public class Carreta extends Veiculo {
 

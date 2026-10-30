@@ -7,8 +7,8 @@ import br.com.rotacerta.dominio.veiculo.Vuc;
  * Operação de transporte urbano: cria VUCs para entregas de até 100 km
  * e até 3.000 kg, sem carga perigosa (RN06).
  *
- * @note Papel no Padrão: Concrete Creator (Factory Method)
  * @author Douglas
+ * @note Papel no Padrão: Concrete Creator (Factory Method)
  */
 public class OperacaoUrbana extends OperacaoTransporte {
 

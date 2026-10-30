@@ -4,12 +4,15 @@ import br.com.rotacerta.dominio.Entrega;
 
 /**
  * Estado Em Trânsito: permite somente as ações previstas no ciclo da entrega.
- * @note Papel no Padrão: Concrete State (State)
+ *
  * @author Jonas
+ * @note Papel no Padrão: Concrete State (State)
  */
 public final class EmTransito implements EstadoEntrega {
     @Override
-    public String getNome() { return "Em Trânsito"; }
+    public String getNome() {
+        return "Em Trânsito";
+    }
 
     @Override
     public void reter(Entrega entrega) {
