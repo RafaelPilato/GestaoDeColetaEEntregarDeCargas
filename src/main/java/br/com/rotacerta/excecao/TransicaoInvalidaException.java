@@ -10,7 +10,7 @@ package br.com.rotacerta.excecao;
 public class TransicaoInvalidaException extends RegraNegocioException {
 
     public TransicaoInvalidaException(String estadoAtual, String acao){
-        super("Ação \"" + acao + "\" não é permitda no estado \"" + estadoAtual + "\".");
+        super("Ação \"" + acao + "\" não é permitida no estado \"" + estadoAtual + "\".");
     }
 
     public TransicaoInvalidaException(String mensagem) {

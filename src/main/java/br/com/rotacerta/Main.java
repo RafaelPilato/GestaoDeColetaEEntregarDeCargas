@@ -1,9 +1,20 @@
 package br.com.rotacerta;
 
+import br.com.rotacerta.dominio.Cliente;
+import br.com.rotacerta.dominio.OrdemCarga;
 import br.com.rotacerta.dominio.carga.ItemCarga;
 import br.com.rotacerta.dominio.carga.Pallet;
 import br.com.rotacerta.dominio.carga.Volume;
 import br.com.rotacerta.excecao.RegraNegocioException;
+import br.com.rotacerta.padroes.comportamental.observer.CentralMonitoramento;
+import br.com.rotacerta.padroes.comportamental.observer.NotificadorCliente;
+import br.com.rotacerta.padroes.comportamental.observer.SetorFinanceiro;
+import br.com.rotacerta.padroes.estrutural.adapter.GeoFrotaAdapter;
+import br.com.rotacerta.padroes.estrutural.adapter.SatTrackAdapter;
+import br.com.rotacerta.servico.CalculadoraFrete;
+import br.com.rotacerta.servico.EntregaService;
+import br.com.rotacerta.servico.RastreamentoService;
+import br.com.rotacerta.servico.RepositorioEntregas;
 import br.com.rotacerta.util.Log;
 
 import java.util.ArrayList;
@@ -27,6 +38,20 @@ public class Main {
      */
     private static final List<ItemCarga> cargas = new ArrayList<>();
 
+    private static final RepositorioEntregas repositorio = new RepositorioEntregas();
+    private static final EntregaService entregaService = new EntregaService(
+            repositorio,
+            new CalculadoraFrete(),
+            List.of(new NotificadorCliente(), new SetorFinanceiro(), new CentralMonitoramento())
+    );
+    private static final RastreamentoService rastreamentoService = new RastreamentoService(
+            List.of(new SatTrackAdapter(), new GeoFrotaAdapter()));
+
+    private static final List<Cliente> clientes = new ArrayList<>(List.of(
+            new Cliente("Metalúrgica Paraná", "12.345.678/0001-90", "compras@metalpr.com.br"),
+            new Cliente("Distribuidora Sul", "98.765.432/0001-10", "logistica@distsul.com.br"),
+            new Cliente("Química Curitiba", "45.678.912/0001-33", "expedicao@quimicacwb.com.br")));
+
     public static void main(String[] args) {
         int opcao;
         do {
@@ -34,8 +59,10 @@ public class Main {
             opcao = lerInteiro("Escolha uma opção: ");
             try {
                 switch (opcao) {
+                    case 1 -> menuClientes();
                     case 2 -> menuCarga();
-                    case 1, 3, 4, 5, 6, 7, 8, 9 -> Log.info("Em construção.");
+                    case 3 -> criarOrdem();
+                    case 4, 5, 6, 7, 8, 9 -> Log.info("Em construção.");
                     case 0 -> Log.info("Encerrando o RotaCerta. Até mais!");
                     default -> Log.erro("Opção inválida.");
                 }
@@ -150,6 +177,87 @@ public class Main {
         }
     }
 
+    private static void menuClientes() {
+        int opcao;
+        do {
+            System.out.println();
+            System.out.println("--- CLIENTES ---");
+            System.out.println(" 1. Listar clientes");
+            System.out.println(" 2. Cadastrar cliente");
+            System.out.println(" 0. Voltar");
+            opcao = lerInteiro("Escolha uma opção: ");
+
+            try {
+                switch (opcao) {
+                    case 1 -> listarClientes();
+                    case 2 -> cadastrarCliente();
+                    case 0 -> Log.info("Voltando...");
+                    default -> Log.erro("Opção inválida.");
+                }
+            } catch (RegraNegocioException e) {
+                Log.erro(e.getMessage());
+            }
+        } while (opcao != 0);
+    }
+
+    private static void listarClientes() {
+        for (int i = 0; i < clientes.size(); i++) {
+            System.out.println(" [" + (i + 1) + "] " + clientes.get(i));
+        }
+    }
+
+    private static void cadastrarCliente() {
+        String nome = lerTexto("Nome: ");
+        String documento = lerTexto("CNPJ/CPF: ");
+        String email = lerTexto("E-mail: ");
+
+        clientes.add(new Cliente(nome, documento, email));
+        Log.info("Cliente \"" + nome + "\" cadastrado.");
+    }
+
+    private static void criarOrdem() {
+        if (cargas.isEmpty()) {
+            throw new RegraNegocioException("Nenhuma carga disponível. Monte uma carga na opção 2 antes.");
+        }
+
+        Cliente cliente = escolher("Escolha o cliente:", clientes);
+
+        System.out.println("Escolha a carga:");
+        exibirCargas();
+        int numCarga = lerInteiro("Número: ");
+
+        if (numCarga < 1 || numCarga > cargas.size()) {
+            throw new RegraNegocioException("Número de carga inválido.");
+        }
+        ItemCarga carga = cargas.get(numCarga - 1);
+
+        OrdemCarga.Builder builder = new OrdemCarga.Builder(cliente, carga)
+                .origem(lerTexto("Cidade de origem: "))
+                .destino(lerTexto("Cidade de destino: "))
+                .distanciaKm(lerDecimal("Distância (km): "));
+
+        if (lerSimNao("Contratar seguro?")) {
+            builder.comSeguro();
+        }
+        if (lerSimNao("Contratar escolta?")) {
+            builder.comEscolta();
+        }
+        String agendamento = lerTexto("Agendamento (deixe em branco se não houver): ");
+        if (!agendamento.isBlank()) {
+            builder.agendarPara(agendamento);
+        }
+        String observacoes = lerTexto("Observações (deixe em branco se não houver): ");
+        if (!observacoes.isBlank()) {
+            builder.observacoes(observacoes);
+        }
+
+        OrdemCarga ordem = builder.build();
+        entregaService.criarEntrega(ordem);
+        cargas.remove(carga);
+
+        Log.info("Ordem " + ordem.getNumero() + " criada. Próximo passo: alocar o veículo (opção 4).");
+    }
+
     // ------------------------------------------------------------------
     // Leitura do teclado
     // ------------------------------------------------------------------
@@ -190,5 +298,29 @@ public class Main {
             if (resposta.equals("n")) return false;
             Log.erro("Responda com s ou n.");
         }
+    }
+
+    /**
+     * Mostra uma lista numerada e devolve o item escolhido pelo usuário.
+     * Usa o toString() de cada item para exibir as opções.
+     */
+    private static <T> T escolher(String titulo, List<T> itens) {
+        if (itens.isEmpty()) {
+            throw new RegraNegocioException("Não há opções disponíveis para: " + titulo);
+        }
+
+        System.out.println(titulo);
+
+        for (int i = 0; i < itens.size(); i++) {
+            System.out.println(" [" + (i + 1) + "] " + itens.get(i));
+        }
+
+        int numero = lerInteiro("Número: ");
+
+        if (numero < 1 || numero > itens.size()) {
+            throw new RegraNegocioException("Número inválido.");
+        }
+
+        return itens.get(numero - 1);
     }
 }

@@ -1,5 +1,7 @@
 package br.com.rotacerta.dominio;
 
+import br.com.rotacerta.excecao.RegraNegocioException;
+
 /**
  * Cliente (embarcador) que contrata o transporte da carga.
  *
@@ -12,6 +14,12 @@ public class Cliente {
     private final String email;
 
     public Cliente(String nome, String documento, String email) {
+        if (nome.isBlank() || documento.isBlank()) {
+            throw new RegraNegocioException("Nome e documento são obrigatórios.");
+        }
+
+
+
         this.nome = nome;
         this.documento = documento;
         this.email = email;

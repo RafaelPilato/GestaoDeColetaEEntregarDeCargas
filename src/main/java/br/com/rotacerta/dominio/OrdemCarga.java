@@ -129,7 +129,7 @@ public class OrdemCarga {
 
         /**
          * Valida os campos obrigatórios (RN03), aplica o seguro e a escolta
-         * automáticos (RN04 e RN05), gera o número sequencial da ordem e
+         * automáticos, gera o número sequencial da ordem e
          * devolve o objeto pronto e imutável.
          *
          * @return a ordem de carga criada
@@ -180,16 +180,16 @@ public class OrdemCarga {
             }
         }
 
-        /** RN04: carga perigosa exige seguro. RN05: valor alto exige escolta. */
+        /** Carga perigosa exige seguro. RN05: valor alto exige escolta. */
         private void aplicarRegrasAutomaticas() {
             if (carga.isPerigoso() && !seguro) {
                 seguro = true;
-                Log.padrao("BUILDER", "Carga perigosa detectada: seguro adicionado automaticamente (RN04)");
+                Log.padrao("BUILDER", "Carga perigosa detectada: seguro adicionado automaticamente");
             }
             if (carga.getValor() > LIMITE_ESCOLTA && !escolta) {
                 escolta = true;
                 Log.padrao("BUILDER", String.format(
-                        "Carga de R$ %.2f acima do limite: escolta adicionada automaticamente (RN05)",
+                        "Carga de R$ %.2f acima do limite: escolta adicionada automaticamente",
                         carga.getValor()));
             }
         }
