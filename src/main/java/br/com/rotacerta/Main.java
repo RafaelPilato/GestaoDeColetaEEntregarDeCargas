@@ -10,6 +10,7 @@ import br.com.rotacerta.dominio.carga.Volume;
 import br.com.rotacerta.excecao.RegraNegocioException;
 import br.com.rotacerta.padroes.comportamental.observer.CentralMonitoramento;
 import br.com.rotacerta.padroes.comportamental.observer.NotificadorCliente;
+import br.com.rotacerta.padroes.comportamental.observer.ObservadorEntrega;
 import br.com.rotacerta.padroes.comportamental.observer.SetorFinanceiro;
 import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoRegional;
 import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoRodoviaria;
@@ -74,7 +75,9 @@ public class Main {
                     case 3 -> criarOrdem();
                     case 4 -> alocarVeiculo();
                     case 5 -> rastrearVeiculo();
-                    case 6, 7, 8, 9 -> Log.info("Em construção.");
+                    case 6 -> atualizarStatus();
+                    case 7 -> gerenciarSetores();
+                    case 8, 9 -> Log.info("Em construção.");
                     case 0 -> Log.info("Encerrando o RotaCerta. Até mais!");
                     default -> Log.erro("Opção inválida.");
                 }
@@ -293,6 +296,71 @@ public class Main {
 
         Posicao posicao = rastreamentoService.localizar(entrega, rastreador);
         Log.info("Posição de " + entrega.getVeiculo().getPlaca() + ": " + posicao);
+    }
+
+    private static void atualizarStatus() {
+        Entrega entrega = escolher("Escolha a entrega:", entregaService.listar());
+
+        int acao;
+        do {
+            System.out.println();
+            System.out.println("--- STATUS DA ENTREGA " + entrega.getOrdem().getNumero() + " [State + Observer] ---");
+            System.out.println(" Status atual: " + entrega.getEstado().getNome());
+            System.out.println(" 1. Coletar");
+            System.out.println(" 2. Despachar");
+            System.out.println(" 3. Reter em fiscalização");
+            System.out.println(" 4. Liberar da fiscalização");
+            System.out.println(" 5. Entregar");
+            System.out.println(" 6. Devolver");
+            System.out.println(" 0. Voltar");
+            acao = lerInteiro("Escolha uma ação: ");
+
+            try {
+                switch (acao) {
+                    case 1 -> entrega.coletar();
+                    case 2 -> entrega.despachar();
+                    case 3 -> entrega.reter();
+                    case 4 -> entrega.liberar();
+                    case 5 -> entrega.entregar();
+                    case 6 -> entrega.devolver();
+                    case 0 -> Log.info("Voltando...");
+                    default -> Log.erro("Opção inválida.");
+                }
+            } catch (RegraNegocioException e) {
+                Log.erro(e.getMessage());
+            }
+        } while (acao != 0);
+    }
+
+    private static void gerenciarSetores() {
+        Entrega entrega = escolher("Escolha a entrega:", entregaService.listar());
+        List<ObservadorEntrega> setores = entregaService.getSetores();
+
+        int opcao;
+        do {
+            System.out.println();
+            System.out.println("--- SETORES NOTIFICADOS - " + entrega.getOrdem().getNumero() + " [Observer] ---");
+            for (int i = 0; i < setores.size(); i++) {
+                ObservadorEntrega setor = setores.get(i);
+                boolean inscrito = entrega.getObservadores().contains(setor);
+                System.out.println(" " + (i + 1) + ". " + setor.getNome() + (inscrito ? " [ATIVO]" : " [INATIVO]"));
+            }
+            System.out.println(" 0. Voltar");
+            opcao = lerInteiro("Escolha um setor para ativar/desativar: ");
+
+            if (opcao >= 1 && opcao <= setores.size()) {
+                ObservadorEntrega setor = setores.get(opcao - 1);
+                if (entrega.getObservadores().contains(setor)) {
+                    entrega.removerObservador(setor);
+                    Log.padrao("OBSERVER", setor.getNome() + " removido da entrega " + entrega.getOrdem().getNumero());
+                } else {
+                    entrega.adicionarObservador(setor);
+                    Log.padrao("OBSERVER", setor.getNome() + " inscrito na entrega " + entrega.getOrdem().getNumero());
+                }
+            } else if (opcao != 0) {
+                Log.erro("Opção inválida.");
+            }
+        } while (opcao != 0);
     }
 
     // ------------------------------------------------------------------

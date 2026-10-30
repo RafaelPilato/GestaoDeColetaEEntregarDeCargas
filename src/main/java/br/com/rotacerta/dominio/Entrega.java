@@ -50,7 +50,7 @@ public class Entrega implements SujeitoEntrega {
 
     /**
      * Chamado pelos estados concretos para trocar o estado da entrega.
-     * Registra a mudança no histórico (RN16) e notifica os observadores.
+     * Registra a mudança no histórico e notifica os observadores.
      *
      * @param novo o novo estado da entrega
      */

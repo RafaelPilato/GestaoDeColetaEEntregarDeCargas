@@ -66,8 +66,8 @@ public class OrdemCarga {
      * construtor com dez parâmetros, os dados obrigatórios entram no
      * construtor do Builder e os opcionais em métodos encadeados. Assim a
      * criação fica legível e existe um único lugar para validar tudo: o
-     * {@code build()}, que confere os campos obrigatórios (RN03) e aplica o
-     * seguro (RN04) e a escolta (RN05) automáticos antes de entregar a
+     * {@code build()}, que confere os campos obrigatórios e aplica o
+     * seguro e a escolta automáticos antes de entregar a
      * ordem pronta.</p>
      *
      * <p>Exemplo de uso:</p>
@@ -84,7 +84,7 @@ public class OrdemCarga {
      */
     public static class Builder {
 
-        /** Valor da carga acima do qual a escolta passa a ser obrigatória (RN05). */
+        /** Valor da carga acima do qual a escolta passa a ser obrigatória. */
         private static final double LIMITE_ESCOLTA = 300_000.00;
 
         /** Contador das ordens já criadas, usado para gerar "OC-0001", "OC-0002"... */
@@ -128,7 +128,7 @@ public class OrdemCarga {
         }
 
         /**
-         * Valida os campos obrigatórios (RN03), aplica o seguro e a escolta
+         * Valida os campos obrigatórios, aplica o seguro e a escolta
          * automáticos, gera o número sequencial da ordem e
          * devolve o objeto pronto e imutável.
          *

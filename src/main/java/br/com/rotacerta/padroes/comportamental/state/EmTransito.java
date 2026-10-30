@@ -3,7 +3,7 @@ package br.com.rotacerta.padroes.comportamental.state;
 import br.com.rotacerta.dominio.Entrega;
 
 /**
- * Estado Em Trânsito: permite somente as ações previstas no ciclo da entrega (RN12/RN13).
+ * Estado Em Trânsito: permite somente as ações previstas no ciclo da entrega.
  * @note Papel no Padrão: Concrete State (State)
  * @author Jonas
  */

@@ -4,7 +4,7 @@ import br.com.rotacerta.dominio.Entrega;
 import br.com.rotacerta.excecao.TransicaoInvalidaException;
 
 /**
- * Estado Aguardando Coleta: permite somente as ações previstas no ciclo da entrega (RN12/RN13).
+ * Estado Aguardando Coleta: permite somente as ações previstas no ciclo da entrega.
  * @note Papel no Padrão: Concrete State (State)
  * @author Jonas
  */
@@ -15,7 +15,7 @@ public final class AguardandoColeta implements EstadoEntrega {
     @Override
     public void coletar(Entrega entrega) {
         if (entrega.getVeiculo() == null) {
-            throw new TransicaoInvalidaException("Coletar exige veículo alocado (RN11).");
+            throw new TransicaoInvalidaException("Coletar exige veículo alocado.");
         }
         entrega.mudarEstado(new Coletada());
     }
