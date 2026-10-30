@@ -7,6 +7,7 @@ import br.com.rotacerta.dominio.Posicao;
 import br.com.rotacerta.dominio.carga.ItemCarga;
 import br.com.rotacerta.dominio.carga.Pallet;
 import br.com.rotacerta.dominio.carga.Volume;
+import br.com.rotacerta.excecao.AlocacaoInvalidaException;
 import br.com.rotacerta.excecao.RegraNegocioException;
 import br.com.rotacerta.padroes.comportamental.observer.CentralMonitoramento;
 import br.com.rotacerta.padroes.comportamental.observer.NotificadorCliente;
@@ -188,19 +189,25 @@ public class Main {
     }
 
     private static void colocarItemNoPallet() {
+        boolean existePallet = false;
+        for (ItemCarga carga : cargas) {
+            if (carga instanceof Pallet) {
+                existePallet = true;
+                break;
+            }
+        }
+
+        if (!existePallet) {
+            throw new RegraNegocioException("Nenhum pallet criado. Crie um pallet na opção 2 antes de organizar a carga.");
+        }
         if (cargas.size() < 2) {
-            Log.info("É preciso ter pelo menos 2 cargas montadas para organizar.");
-            return;
+            throw new RegraNegocioException("Não há outra carga para colocar dentro do pallet. Crie um volume ou outro pallet antes.");
         }
 
         exibirCargas();
 
-        int numItem = lerInteiro("Número do item a ser colocado: ");
-        int numDestino = lerInteiro("Número do pallet que vai recebê-lo: ");
-
-        if (numItem < 1 || numItem > cargas.size() || numDestino < 1 || numDestino > cargas.size()) {
-            throw new RegraNegocioException("Número de carga inválido.");
-        }
+        int numItem = lerNumeroEntre("Número do item a ser colocado: ", 1, cargas.size());
+        int numDestino = lerNumeroEntre("Número do pallet que vai recebê-lo: ", 1, cargas.size());
 
         ItemCarga item = cargas.get(numItem - 1);
         ItemCarga destino = cargas.get(numDestino - 1);
@@ -259,12 +266,17 @@ public class Main {
         Cliente cliente = escolher("Escolha o cliente:", clientes);
 
         System.out.println("Escolha a carga:");
-        exibirCargas();
-        int numCarga = lerInteiro("Número: ");
 
-        if (numCarga < 1 || numCarga > cargas.size()) {
-            throw new RegraNegocioException("Número de carga inválido.");
+        exibirCargas();
+
+        System.out.println("[0] Cancelar");
+
+        int numCarga = lerNumeroEntre("Número: ", 0, cargas.size());
+
+        if (numCarga == 0) {
+            throw new RegraNegocioException("Operação cancelada.");
         }
+
         ItemCarga carga = cargas.get(numCarga - 1);
 
         OrdemCarga.Builder builder = new OrdemCarga.Builder(cliente, carga)
@@ -308,9 +320,15 @@ public class Main {
             return;
         }
 
-        OperacaoTransporte operacao = escolher("Escolha a operação de transporte:", operacoes);
-
-        entregaService.alocarVeiculo(entrega, operacao);
+        while (true) {
+            OperacaoTransporte operacao = escolher("Escolha a operação de transporte:", operacoes);
+            try {
+                entregaService.alocarVeiculo(entrega, operacao);
+                break;
+            } catch (AlocacaoInvalidaException e) {
+                Log.erro(e.getMessage());
+            }
+        }
 
         Log.info("Próximos passos: rastrear o veículo (opção 5) ou atualizar o status (opção 6).");
     }
@@ -372,9 +390,9 @@ public class Main {
                 System.out.println(" " + (i + 1) + ". " + setor.getNome() + (inscrito ? " [ATIVO]" : " [INATIVO]"));
             }
             System.out.println(" 0. Voltar");
-            opcao = lerInteiro("Escolha um setor para ativar/desativar: ");
+            opcao = lerNumeroEntre("Escolha um setor para ativar/desativar: ", 0, setores.size());
 
-            if (opcao >= 1 && opcao <= setores.size()) {
+            if (opcao != 0) {
                 ObservadorEntrega setor = setores.get(opcao - 1);
                 if (entrega.getObservadores().contains(setor)) {
                     entrega.removerObservador(setor);
@@ -383,8 +401,6 @@ public class Main {
                     entrega.adicionarObservador(setor);
                     Log.padrao("OBSERVER", setor.getNome() + " inscrito na entrega " + entrega.getOrdem().getNumero());
                 }
-            } else if (opcao != 0) {
-                Log.erro("Opção inválida.");
             }
         } while (opcao != 0);
     }
@@ -404,9 +420,9 @@ public class Main {
                     + (e.getValorFrete() > 0 ? String.format(" | frete: R$ %.2f", e.getValorFrete()) : ""));
         }
 
-        if (lerSimNao("Ver detalhes e histórico de uma entrega?")) {
-            Entrega entrega = escolher("Escolha a entrega:", entregas);
-            exibirDetalhes(entrega);
+        int numero = lerNumeroEntre("Número da entrega para ver os detalhes (0 para voltar): ", 0, entregas.size());
+        if (numero != 0) {
+            exibirDetalhes(entregas.get(numero - 1));
         }
     }
 
@@ -500,12 +516,24 @@ public class Main {
             System.out.println(" [" + (i + 1) + "] " + itens.get(i));
         }
 
-        int numero = lerInteiro("Número: ");
+        System.out.println(" [0] Cancelar");
 
-        if (numero < 1 || numero > itens.size()) {
-            throw new RegraNegocioException("Número inválido.");
+        int numero = lerNumeroEntre("Número: ", 0, itens.size());
+
+        if (numero == 0) {
+            throw new RegraNegocioException("Operação cancelada.");
         }
 
         return itens.get(numero - 1);
+    }
+
+    static int lerNumeroEntre(String mensagem, int min, int max) {
+        while (true) {
+            int numero = lerInteiro(mensagem);
+            if (numero >= min && numero <= max) {
+                return numero;
+            }
+            Log.erro("Digite um número entre " + min + " e " + max + ".");
+        }
     }
 }
