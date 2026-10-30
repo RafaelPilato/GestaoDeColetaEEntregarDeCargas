@@ -77,7 +77,7 @@ public class Main {
                     case 5 -> rastrearVeiculo();
                     case 6 -> atualizarStatus();
                     case 7 -> gerenciarSetores();
-                    case 8, 9 -> Log.info("Em construção.");
+                    case 8 -> listarEntregas();
                     case 0 -> Log.info("Encerrando o RotaCerta. Até mais!");
                     default -> Log.erro("Opção inválida.");
                 }
@@ -98,7 +98,6 @@ public class Main {
         System.out.println(" 6. Atualizar status da entrega                 [State + Observer]");
         System.out.println(" 7. Gerenciar setores notificados               [Observer]");
         System.out.println(" 8. Listar entregas e histórico");
-        System.out.println(" 9. Carregar cenário de demonstração");
         System.out.println(" 0. Sair");
         System.out.println("================================================================");
     }
@@ -361,6 +360,60 @@ public class Main {
                 Log.erro("Opção inválida.");
             }
         } while (opcao != 0);
+    }
+
+    private static void listarEntregas() {
+        List<Entrega> entregas = entregaService.listar();
+        if (entregas.isEmpty()) {
+            Log.info("Nenhuma entrega cadastrada. Crie uma ordem na opção 3.");
+            return;
+        }
+
+        System.out.println();
+        System.out.println("--- ENTREGAS ---");
+        for (int i = 0; i < entregas.size(); i++) {
+            Entrega e = entregas.get(i);
+            System.out.println(" [" + (i + 1) + "] " + e
+                    + (e.getValorFrete() > 0 ? String.format(" | frete: R$ %.2f", e.getValorFrete()) : ""));
+        }
+
+        if (lerSimNao("Ver detalhes e histórico de uma entrega?")) {
+            Entrega entrega = escolher("Escolha a entrega:", entregas);
+            exibirDetalhes(entrega);
+        }
+    }
+
+    private static void exibirDetalhes(Entrega entrega) {
+        OrdemCarga ordem = entrega.getOrdem();
+
+        System.out.println();
+        System.out.println("--- DETALHES DA ENTREGA " + ordem.getNumero() + " ---");
+        System.out.println(" Cliente: " + ordem.getCliente());
+        System.out.println(" Rota: " + ordem.getOrigem() + " -> " + ordem.getDestino()
+                + String.format(" (%.0f km)", ordem.getDistanciaKm()));
+        System.out.println(" Seguro: " + (ordem.isSeguro() ? "sim" : "não")
+                + " | Escolta: " + (ordem.isEscolta() ? "sim" : "não")
+                + " | Carga perigosa: " + (ordem.isCargaPerigosa() ? "sim" : "não"));
+        if (ordem.getAgendamento() != null) {
+            System.out.println(" Agendamento: " + ordem.getAgendamento());
+        }
+        if (ordem.getObservacoes() != null) {
+            System.out.println(" Observações: " + ordem.getObservacoes());
+        }
+        System.out.println(" Veículo: " + (entrega.getVeiculo() == null ? "não alocado" : entrega.getVeiculo()));
+        System.out.println(" Status: " + entrega.getEstado().getNome());
+
+        System.out.println(" Carga:");
+        ordem.getCarga().exibir("   ");
+
+        System.out.println(" Histórico:");
+        if (entrega.getHistorico().isEmpty()) {
+            System.out.println("   (nenhuma mudança de status ainda)");
+        } else {
+            for (String evento : entrega.getHistorico()) {
+                System.out.println("   " + evento);
+            }
+        }
     }
 
     // ------------------------------------------------------------------
