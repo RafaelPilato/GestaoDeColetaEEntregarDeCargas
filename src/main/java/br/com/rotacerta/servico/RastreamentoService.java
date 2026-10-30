@@ -12,8 +12,8 @@ import java.util.List;
  * {@link Rastreador}, sem conhecer os fornecedores nem seus formatos:
  * os adapters concretos são recebidos prontos pelo construtor.
  *
- * @note Papel no Padrão: Client (Adapter)
  * @author Rafael
+ * @note Papel no Padrão: Client (Adapter)
  */
 
 public class RastreamentoService {
@@ -29,7 +29,7 @@ public class RastreamentoService {
 
     public Posicao localizar(Entrega entrega, Rastreador rastreador) {
         if (entrega.getVeiculo() == null) {
-            throw new RegraNegocioException("A entrega " + entrega.getOrdem().getNumero() + "ainda não tem veículo alocado. Use a opção 4 antes de rastrear.");
+            throw new RegraNegocioException("A entrega " + entrega.getOrdem().getNumero() + " ainda não tem veículo alocado. Use a opção 4 antes de rastrear.");
         }
 
         return rastreador.localizar(entrega.getVeiculo().getPlaca());

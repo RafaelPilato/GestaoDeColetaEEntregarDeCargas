@@ -7,9 +7,9 @@ package br.com.rotacerta.excecao;
  * @author Rafael
  */
 
-public class RegraNegocioException extends RuntimeException{
+public class RegraNegocioException extends RuntimeException {
 
-    public RegraNegocioException(String mensagem){
+    public RegraNegocioException(String mensagem) {
         super(mensagem);
     }
 }

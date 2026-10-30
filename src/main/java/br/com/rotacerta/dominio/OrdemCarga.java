@@ -11,8 +11,8 @@ import br.com.rotacerta.util.Log;
  * público, de modo que, depois de criada, a ordem não muda mais. É o objeto
  * que o Builder entrega pronto e já validado.</p>
  *
- * @note Papel no Padrão: Product (Builder)
  * @author Douglas
+ * @note Papel no Padrão: Product (Builder)
  */
 public class OrdemCarga {
 
@@ -42,17 +42,49 @@ public class OrdemCarga {
         this.observacoes = b.observacoes;
     }
 
-    public String getNumero() { return numero; }
-    public Cliente getCliente() { return cliente; }
-    public ItemCarga getCarga() { return carga; }
-    public String getOrigem() { return origem; }
-    public String getDestino() { return destino; }
-    public double getDistanciaKm() { return distanciaKm; }
-    public boolean isSeguro() { return seguro; }
-    public boolean isEscolta() { return escolta; }
-    public boolean isCargaPerigosa() { return cargaPerigosa; }
-    public String getAgendamento() { return agendamento; }
-    public String getObservacoes() { return observacoes; }
+    public String getNumero() {
+        return numero;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public ItemCarga getCarga() {
+        return carga;
+    }
+
+    public String getOrigem() {
+        return origem;
+    }
+
+    public String getDestino() {
+        return destino;
+    }
+
+    public double getDistanciaKm() {
+        return distanciaKm;
+    }
+
+    public boolean isSeguro() {
+        return seguro;
+    }
+
+    public boolean isEscolta() {
+        return escolta;
+    }
+
+    public boolean isCargaPerigosa() {
+        return cargaPerigosa;
+    }
+
+    public String getAgendamento() {
+        return agendamento;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
 
     @Override
     public String toString() {
@@ -66,8 +98,8 @@ public class OrdemCarga {
      * construtor com dez parâmetros, os dados obrigatórios entram no
      * construtor do Builder e os opcionais em métodos encadeados. Assim a
      * criação fica legível e existe um único lugar para validar tudo: o
-     * {@code build()}, que confere os campos obrigatórios (RN03) e aplica o
-     * seguro (RN04) e a escolta (RN05) automáticos antes de entregar a
+     * {@code build()}, que confere os campos obrigatórios e aplica o
+     * seguro e a escolta automáticos antes de entregar a
      * ordem pronta.</p>
      *
      * <p>Exemplo de uso:</p>
@@ -79,15 +111,19 @@ public class OrdemCarga {
      *         .build();
      * </pre>
      *
-     * @note Papel no Padrão: Builder (Concrete Builder)
      * @author Douglas
+     * @note Papel no Padrão: Builder (Concrete Builder)
      */
     public static class Builder {
 
-        /** Valor da carga acima do qual a escolta passa a ser obrigatória (RN05). */
+        /**
+         * Valor da carga acima do qual a escolta passa a ser obrigatória.
+         */
         private static final double LIMITE_ESCOLTA = 300_000.00;
 
-        /** Contador das ordens já criadas, usado para gerar "OC-0001", "OC-0002"... */
+        /**
+         * Contador das ordens já criadas, usado para gerar "OC-0001", "OC-0002"...
+         */
         private static int sequencia = 0;
 
         private final Cliente cliente;
@@ -106,36 +142,49 @@ public class OrdemCarga {
         }
 
         public Builder origem(String origem) {
-            this.origem = origem; return this;
+            this.origem = origem;
+            return this;
         }
+
         public Builder destino(String destino) {
-            this.destino = destino; return this;
+            this.destino = destino;
+            return this;
         }
+
         public Builder distanciaKm(double km) {
-            this.distanciaKm = km; return this;
+            this.distanciaKm = km;
+            return this;
         }
+
         public Builder comSeguro() {
-            this.seguro = true; return this;
+            this.seguro = true;
+            return this;
         }
+
         public Builder comEscolta() {
-            this.escolta = true; return this;
+            this.escolta = true;
+            return this;
         }
+
         public Builder agendarPara(String dataHora) {
-            this.agendamento = dataHora; return this;
+            this.agendamento = dataHora;
+            return this;
         }
+
         public Builder observacoes(String texto) {
-            this.observacoes = texto; return this;
+            this.observacoes = texto;
+            return this;
         }
 
         /**
-         * Valida os campos obrigatórios (RN03), aplica o seguro e a escolta
-         * automáticos (RN04 e RN05), gera o número sequencial da ordem e
+         * Valida os campos obrigatórios, aplica o seguro e a escolta
+         * automáticos, gera o número sequencial da ordem e
          * devolve o objeto pronto e imutável.
          *
          * @return a ordem de carga criada
          * @throws OrdemInvalidaException quando falta cliente, carga, origem
-         *         ou destino, quando a carga está vazia ou quando a distância
-         *         não é maior que zero
+         *                                ou destino, quando a carga está vazia ou quando a distância
+         *                                não é maior que zero
          */
         public OrdemCarga build() {
             Log.padrao("BUILDER", "Iniciando montagem da ordem para \""
@@ -155,7 +204,9 @@ public class OrdemCarga {
             return ordem;
         }
 
-        /** RN03: cliente, carga não vazia, origem, destino e distância maior que zero. */
+        /**
+         * RN03: cliente, carga não vazia, origem, destino e distância maior que zero.
+         */
         private void validarObrigatorios() {
             if (cliente == null) {
                 throw new OrdemInvalidaException("A ordem de carga exige um cliente.");
@@ -180,16 +231,18 @@ public class OrdemCarga {
             }
         }
 
-        /** RN04: carga perigosa exige seguro. RN05: valor alto exige escolta. */
+        /**
+         * Carga perigosa exige seguro. RN05: valor alto exige escolta.
+         */
         private void aplicarRegrasAutomaticas() {
             if (carga.isPerigoso() && !seguro) {
                 seguro = true;
-                Log.padrao("BUILDER", "Carga perigosa detectada: seguro adicionado automaticamente (RN04)");
+                Log.padrao("BUILDER", "Carga perigosa detectada: seguro adicionado automaticamente");
             }
             if (carga.getValor() > LIMITE_ESCOLTA && !escolta) {
                 escolta = true;
                 Log.padrao("BUILDER", String.format(
-                        "Carga de R$ %.2f acima do limite: escolta adicionada automaticamente (RN05)",
+                        "Carga de R$ %.2f acima do limite: escolta adicionada automaticamente",
                         carga.getValor()));
             }
         }

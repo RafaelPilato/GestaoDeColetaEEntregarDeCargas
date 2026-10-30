@@ -10,19 +10,19 @@ package br.com.rotacerta.util;
 
 public final class Log {
 
-    private Log(){
+    private Log() {
 
     }
 
-    public static void padrao(String padrao, String mensagem){
+    public static void padrao(String padrao, String mensagem) {
         System.out.println(" [ " + padrao + " ] " + mensagem);
     }
 
-    public static void info(String mensagem){
+    public static void info(String mensagem) {
         System.out.println(" " + mensagem);
     }
 
-    public static void erro(String mensagem){
+    public static void erro(String mensagem) {
         System.out.println(" [ ERRO ] " + mensagem);
     }
 }

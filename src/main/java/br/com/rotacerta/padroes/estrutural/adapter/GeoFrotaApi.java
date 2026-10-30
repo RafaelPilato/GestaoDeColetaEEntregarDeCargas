@@ -6,8 +6,8 @@ import java.util.Random;
  * Simula a API externa (fictícia) da GeoFrota, que não pode ser alterada.
  * Identifica o veículo por um código numérico, e não pela placa.
  *
- * @note Papel no Padrão: Adaptee (Adapter)
  * @author Rafael
+ * @note Papel no Padrão: Adaptee (Adapter)
  */
 
 public class GeoFrotaApi {

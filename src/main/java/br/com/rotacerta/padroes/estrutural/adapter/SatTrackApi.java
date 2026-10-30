@@ -7,8 +7,8 @@ import java.util.Random;
  * Simula a API externa (fictícia) da SatTrack, que não pode ser alterada.
  * Identifica o veículo pela placa e devolve um texto "latitude;longitude;kmh".
  *
- * @note Papel no Padrão: Adaptee (Adapter)
  * @author Rafael
+ * @note Papel no Padrão: Adaptee (Adapter)
  */
 
 public class SatTrackApi {

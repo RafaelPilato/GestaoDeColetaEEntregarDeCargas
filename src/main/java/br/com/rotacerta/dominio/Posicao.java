@@ -36,7 +36,7 @@ public class Posicao {
         return longitude;
     }
 
-    public double getVelocidadeKmh () {
+    public double getVelocidadeKmh() {
         return velocidadeKmh;
     }
 
@@ -50,6 +50,6 @@ public class Posicao {
 
     @Override
     public String toString() {
-        return String.format("%.4f / %.4f | %.1f km/h | %s | fonte: %s", latitude, longitude, velocidadeKmh, dataHora.format(FORMATO)  , fornecedor);
+        return String.format("%.4f / %.4f | %.1f km/h | %s | fonte: %s", latitude, longitude, velocidadeKmh, dataHora.format(FORMATO), fornecedor);
     }
 }

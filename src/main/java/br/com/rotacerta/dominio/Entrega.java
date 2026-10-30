@@ -1,15 +1,15 @@
 package br.com.rotacerta.dominio;
 
 import br.com.rotacerta.dominio.veiculo.Veiculo;
-import br.com.rotacerta.padroes.comportamental.state.AguardandoColeta;
 import br.com.rotacerta.excecao.RegraNegocioException;
-import br.com.rotacerta.excecao.TransicaoInvalidaException;
-import br.com.rotacerta.util.Log;
-import java.time.LocalDateTime;
 import br.com.rotacerta.padroes.comportamental.observer.ObservadorEntrega;
 import br.com.rotacerta.padroes.comportamental.observer.SujeitoEntrega;
+import br.com.rotacerta.padroes.comportamental.state.AguardandoColeta;
 import br.com.rotacerta.padroes.comportamental.state.EstadoEntrega;
+import br.com.rotacerta.util.Log;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,66 +23,74 @@ import java.util.List;
  */
 public class Entrega implements SujeitoEntrega {
 
+    private static final DateTimeFormatter FORMATO_HISTORICO =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
     private final OrdemCarga ordem;
     private Veiculo veiculo;
     private double valorFrete;
     private EstadoEntrega estado = new AguardandoColeta();
-    private boolean executandoAcao;
-    private boolean mudouNestaAcao;
     private final List<ObservadorEntrega> observadores = new ArrayList<>();
     private final List<String> historico = new ArrayList<>();
 
     public Entrega(OrdemCarga ordem) {
-        if (ordem == null) throw new RegraNegocioException("A entrega exige uma ordem de carga.");
+        if (ordem == null) {
+            throw new RegraNegocioException("A entrega exige uma ordem de carga.");
+        }
         this.ordem = ordem;
     }
 
     // ---- Ações: delegam para o estado atual (State) ----
     public void coletar() {
-        executarAcao(() -> estado.coletar(this));
+        estado.coletar(this);
     }
 
     public void despachar() {
-        executarAcao(() -> estado.despachar(this));
+        estado.despachar(this);
     }
 
     public void reter() {
-        executarAcao(() -> estado.reter(this));
+        estado.reter(this);
     }
 
     public void liberar() {
-        executarAcao(() -> estado.liberar(this));
+        estado.liberar(this);
     }
 
     public void entregar() {
-        executarAcao(() -> estado.entregar(this));
+        estado.entregar(this);
     }
 
     public void devolver() {
-        executarAcao(() -> estado.devolver(this));
+        estado.devolver(this);
     }
 
     /**
-     * Chamado pelos estados concretos para trocar o estado.
+     * Chamado pelos estados concretos para trocar o estado da entrega.
+     * Registra a mudança no histórico e notifica os observadores.
+     *
+     * @param novo o novo estado da entrega
      */
     public void mudarEstado(EstadoEntrega novo) {
-        if (!executandoAcao || mudouNestaAcao || novo == null) {
-            throw new TransicaoInvalidaException("Use as ações da entrega para mudar seu estado.");
-        }
         String anterior = estado.getNome();
         estado = novo;
-        mudouNestaAcao = true;
+
         String evento = anterior + " -> " + novo.getNome();
-        historico.add(LocalDateTime.now() + " | " + evento);
+        historico.add(LocalDateTime.now().format(FORMATO_HISTORICO) + " | " + evento);
         Log.padrao("STATE", ordem.getNumero() + ": " + evento);
+
         notificarObservadores(anterior, novo.getNome());
     }
 
     // ---- Observer ----
     @Override
     public void adicionarObservador(ObservadorEntrega o) {
-        if (o == null) throw new RegraNegocioException("Observador não pode ser nulo.");
-        if (!observadores.contains(o)) observadores.add(o);
+        if (o == null) {
+            throw new RegraNegocioException("Observador não pode ser nulo.");
+        }
+        if (!observadores.contains(o)) {
+            observadores.add(o);
+        }
     }
 
     @Override
@@ -92,24 +100,8 @@ public class Entrega implements SujeitoEntrega {
 
     @Override
     public void notificarObservadores(String estadoAnterior, String estadoNovo) {
-        for (ObservadorEntrega observador : List.copyOf(observadores)) {
-            try {
-                observador.atualizar(this, estadoAnterior, estadoNovo);
-            } catch (RuntimeException falha) {
-                Log.erro("Falha ao avisar " + observador.getNome() + ": " + falha.getMessage());
-            }
-        }
-    }
-
-    // Evita mudança direta e ações reentrantes disparadas por observadores.
-    private void executarAcao(Runnable acao) {
-        if (executandoAcao) throw new TransicaoInvalidaException("Uma ação já está em andamento.");
-        executandoAcao = true;
-        mudouNestaAcao = false;
-        try {
-            acao.run();
-        } finally {
-            executandoAcao = false;
+        for (ObservadorEntrega observador : observadores) {
+            observador.atualizar(this, estadoAnterior, estadoNovo);
         }
     }
 
@@ -144,5 +136,16 @@ public class Entrega implements SujeitoEntrega {
 
     public List<ObservadorEntrega> getObservadores() {
         return Collections.unmodifiableList(observadores);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s | %s | %s -> %s | %s | veículo: %s",
+                ordem.getNumero(),
+                ordem.getCliente().getNome(),
+                ordem.getOrigem(),
+                ordem.getDestino(),
+                estado.getNome(),
+                veiculo == null ? "não alocado" : veiculo);
     }
 }

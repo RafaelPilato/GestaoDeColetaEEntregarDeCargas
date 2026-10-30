@@ -3,8 +3,8 @@ package br.com.rotacerta.padroes.comportamental.observer;
 /**
  * Objeto observado: mantém os observadores e os notifica a cada mudança.
  *
- * @note Papel no Padrão: Subject (Observer)
  * @author Jonas
+ * @note Papel no Padrão: Subject (Observer)
  */
 public interface SujeitoEntrega {
 

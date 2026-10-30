@@ -2,7 +2,7 @@
 
 Sistema em Java puro que simula o setor de operações de uma transportadora, do recebimento da carga até a entrega ao cliente. Desenvolvido como trabalho final da disciplina de **Padrões de Projeto**, aplicando 6 padrões GoF (2 criacionais, 2 estruturais e 2 comportamentais) a regras de negócio reais do transporte rodoviário de cargas.
 
-> **Status:** em desenvolvimento
+> **Status:** concluído
 
 ## Integrantes
 
@@ -26,7 +26,7 @@ Sistema em Java puro que simula o setor de operações de uma transportadora, do
 ## Principais regras de negócio
 
 - O peso de um pallet é a soma dos itens mais 25 kg de tara. Uma carga é perigosa se qualquer item dentro dela for perigoso.
-- Carga perigosa torna o seguro obrigatório. Carga acima de R$ 300.000,00 exige escolta.
+- Carga perigosa torna o seguro obrigatório. Carga acima de R$ 300.000,00 exige escolta. Ambos são adicionados automaticamente.
 - Cada operação tem seu veículo e seus limites:
 
 | Operação | Veículo | Capacidade | Distância máxima | Carga perigosa | Custo/km |
@@ -36,7 +36,8 @@ Sistema em Java puro que simula o setor de operações de uma transportadora, do
 | Rodoviária | Carreta | 30.000 kg | Sem limite | Sim | R$ 6,80 |
 
 - Frete = distância × custo/km + 0,3% do valor da carga (seguro) + R$ 1.200,00 (escolta) + 20% (carga perigosa).
-- Uma entrega só pode ser coletada com veículo alocado. Entregue e Devolvida são estados finais.
+- O veículo só pode ser alocado ou substituído antes da coleta. A coleta exige veículo alocado.
+- Entregue e Devolvida são estados finais: nenhuma ação é permitida depois deles.
 - Ao ser entregue, o financeiro emite a fatura. Ao ser devolvida, cobra 50% de frete de retorno. Ao ser retida em fiscalização, o monitoramento emite um alerta.
 
 ## Estrutura do projeto
@@ -54,7 +55,7 @@ src/main/java/br/com/rotacerta/
 └── util/                      # Log que exibe os padrões em ação
 ```
 
-Cada classe que participa de um padrão indica seu papel no Javadoc com `@note Papel no Padrão`.
+As peças do Composite (`dominio/carga`), o produto do Builder (`OrdemCarga`) e os produtos do Factory Method (`dominio/veiculo`) ficam no domínio, porque são objetos do negócio. Cada classe que participa de um padrão indica seu papel no Javadoc com `@note Papel no Padrão`.
 
 ## Tecnologias
 
@@ -66,14 +67,38 @@ Cada classe que participa de um padrão indica seu papel no Javadoc com `@note P
 
 1. Clone o repositório:
    ```
-   git clone https://github.com/SEU_USUARIO/SEU_REPO.git
+   git clone https://github.com/RafaelPilato/GestaoDeColetaEEntregarDeCargas.git
    ```
 2. Abra a pasta no IntelliJ IDEA (o projeto é reconhecido como Maven pelo `pom.xml`).
 3. Execute a classe `br.com.rotacerta.Main`.
-4. Navegue pelo menu digitando o número das opções.
+
+## Como usar
+
+O menu principal indica qual padrão cada opção aciona. No terminal, cada padrão em ação aparece com um prefixo, como `[ BUILDER ]` ou `[ STATE ]`.
+
+| Opção | Funcionalidade | Padrão |
+|---|---|---|
+| 1 | Listar e cadastrar clientes (3 já vêm cadastrados) | - |
+| 2 | Montar carga: criar volumes e pallets, colocar e retirar itens de pallets | Composite |
+| 3 | Criar ordem de carga com opcionais | Builder |
+| 4 | Alocar veículo escolhendo a operação de transporte | Factory Method |
+| 5 | Rastrear o veículo escolhendo o fornecedor | Adapter |
+| 6 | Atualizar o status da entrega | State + Observer |
+| 7 | Ativar e desativar os setores notificados de uma entrega | Observer |
+| 8 | Listar entregas e ver detalhes e histórico | - |
+
+### Roteiro de teste sugerido
+
+1. **Opção 2:** crie um pallet e um volume marcado como perigoso, e coloque o volume dentro do pallet. Veja a árvore da carga na opção 4 do submenu.
+2. **Opção 3:** crie uma ordem com essa carga e responda "não" ao seguro. O Builder adiciona o seguro automaticamente, porque a carga é perigosa.
+3. **Opção 4:** escolha a Operação Urbana. O VUC é criado e recusado, porque não transporta carga perigosa. Escolha a Operação Regional: o Toco é aprovado e o frete é detalhado.
+4. **Opção 5:** rastreie o veículo pela SatTrack e depois pela GeoFrota. Os formatos recebidos são diferentes, mas a posição exibida segue o mesmo padrão.
+5. **Opção 7:** desative o setor Cliente.
+6. **Opção 6:** tente entregar antes de coletar (a ação é barrada). Depois siga o ciclo: coletar, despachar, reter, liberar e entregar. Repare que o Cliente não é mais avisado, o Monitoramento alerta a retenção e o Financeiro emite a fatura na entrega.
+7. **Opção 8:** veja os detalhes da entrega e o histórico de status com data e hora.
 
 ## Convenções da equipe
 
-- Branch `main` sempre funcionando. Cada integrante trabalha na sua branch: `feature/estruturais`, `feature/criacionais` e `feature/comportamentais`.
-- Mensagens de commit no padrão: `feat(builder): valida campos obrigatórios da ordem (RN03)`.
+- Branch `main` sempre funcionando. Cada integrante trabalhou na sua branch: `feature/estruturais`, `feature/criacionais` e `feature/comportamentais`, com integração final em `feature/integracao`.
+- Mensagens de commit no padrão: `feat(builder): valida campos obrigatórios da ordem`.
 - Integração na `main` via Pull Request.

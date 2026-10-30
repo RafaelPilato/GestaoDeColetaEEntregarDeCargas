@@ -5,8 +5,8 @@ import br.com.rotacerta.dominio.Entrega;
 /**
  * Setor interessado nas mudanças de status de uma entrega.
  *
- * @note Papel no Padrão: Observer (Observer)
  * @author Jonas
+ * @note Papel no Padrão: Observer (Observer)
  */
 public interface ObservadorEntrega {
 

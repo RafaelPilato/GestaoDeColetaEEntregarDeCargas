@@ -20,19 +20,25 @@ import br.com.rotacerta.util.Log;
  */
 public class CalculadoraFrete {
 
-    /** Percentual do valor da carga cobrado pelo seguro (RN10). */
+    /**
+     * Percentual do valor da carga cobrado pelo seguro (RN10).
+     */
     private static final double PERCENTUAL_SEGURO = 0.003;
 
-    /** Valor fixo cobrado quando a ordem tem escolta (RN10). */
+    /**
+     * Valor fixo cobrado quando a ordem tem escolta (RN10).
+     */
     private static final double VALOR_ESCOLTA = 1_200.00;
 
-    /** Acréscimo sobre o subtotal quando a carga é perigosa (RN10). */
+    /**
+     * Acréscimo sobre o subtotal quando a carga é perigosa (RN10).
+     */
     private static final double ADICIONAL_CARGA_PERIGOSA = 0.20;
 
     /**
      * Calcula o frete e imprime a composição do valor no terminal.
      *
-     * @param ordem ordem de carga, de onde vêm distância, seguro e escolta
+     * @param ordem   ordem de carga, de onde vêm distância, seguro e escolta
      * @param veiculo veículo alocado, que define o custo por km
      * @return o valor final do frete
      * @throws IllegalArgumentException se a ordem ou o veículo forem nulos

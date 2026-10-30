@@ -13,8 +13,8 @@ import java.time.ZoneId;
  * a resposta em uma {@link Posicao}: micrograus em graus, m/s em km/h
  * e epoch (segundos) em data/hora local.
  *
- * @note Papel no Padrão: Adapter (Adapter)
  * @author Rafael
+ * @note Papel no Padrão: Adapter (Adapter)
  */
 
 public class GeoFrotaAdapter implements Rastreador {
@@ -40,5 +40,10 @@ public class GeoFrotaAdapter implements Rastreador {
         LocalDateTime dataHora = LocalDateTime.ofInstant(Instant.ofEpochSecond(resposta.getEpochSegundos()), ZoneId.systemDefault());
 
         return new Posicao(lat, lon, velocidade, dataHora, getFornecedor());
+    }
+
+    @Override
+    public String toString() {
+        return getFornecedor();
     }
 }
