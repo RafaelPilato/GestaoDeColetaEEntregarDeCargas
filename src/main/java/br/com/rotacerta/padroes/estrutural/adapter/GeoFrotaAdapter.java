@@ -41,4 +41,9 @@ public class GeoFrotaAdapter implements Rastreador {
 
         return new Posicao(lat, lon, velocidade, dataHora, getFornecedor());
     }
+
+    @Override
+    public String toString() {
+        return getFornecedor();
+    }
 }

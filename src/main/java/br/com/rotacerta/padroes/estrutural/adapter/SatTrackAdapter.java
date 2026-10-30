@@ -38,4 +38,9 @@ public class SatTrackAdapter implements Rastreador {
 
         return new Posicao(lat, lon, velocidade, dataHora, fornecedor);
     }
+
+    @Override
+    public String toString() {
+        return getFornecedor();
+    }
 }

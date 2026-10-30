@@ -1,7 +1,9 @@
 package br.com.rotacerta;
 
 import br.com.rotacerta.dominio.Cliente;
+import br.com.rotacerta.dominio.Entrega;
 import br.com.rotacerta.dominio.OrdemCarga;
+import br.com.rotacerta.dominio.Posicao;
 import br.com.rotacerta.dominio.carga.ItemCarga;
 import br.com.rotacerta.dominio.carga.Pallet;
 import br.com.rotacerta.dominio.carga.Volume;
@@ -9,7 +11,12 @@ import br.com.rotacerta.excecao.RegraNegocioException;
 import br.com.rotacerta.padroes.comportamental.observer.CentralMonitoramento;
 import br.com.rotacerta.padroes.comportamental.observer.NotificadorCliente;
 import br.com.rotacerta.padroes.comportamental.observer.SetorFinanceiro;
+import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoRegional;
+import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoRodoviaria;
+import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoTransporte;
+import br.com.rotacerta.padroes.criacional.factorymethod.OperacaoUrbana;
 import br.com.rotacerta.padroes.estrutural.adapter.GeoFrotaAdapter;
+import br.com.rotacerta.padroes.estrutural.adapter.Rastreador;
 import br.com.rotacerta.padroes.estrutural.adapter.SatTrackAdapter;
 import br.com.rotacerta.servico.CalculadoraFrete;
 import br.com.rotacerta.servico.EntregaService;
@@ -52,6 +59,9 @@ public class Main {
             new Cliente("Distribuidora Sul", "98.765.432/0001-10", "logistica@distsul.com.br"),
             new Cliente("Química Curitiba", "45.678.912/0001-33", "expedicao@quimicacwb.com.br")));
 
+    private static final List<OperacaoTransporte> operacoes = List.of(
+            new OperacaoUrbana(), new OperacaoRegional(), new OperacaoRodoviaria());
+
     public static void main(String[] args) {
         int opcao;
         do {
@@ -62,7 +72,9 @@ public class Main {
                     case 1 -> menuClientes();
                     case 2 -> menuCarga();
                     case 3 -> criarOrdem();
-                    case 4, 5, 6, 7, 8, 9 -> Log.info("Em construção.");
+                    case 4 -> alocarVeiculo();
+                    case 5 -> rastrearVeiculo();
+                    case 6, 7, 8, 9 -> Log.info("Em construção.");
                     case 0 -> Log.info("Encerrando o RotaCerta. Até mais!");
                     default -> Log.erro("Opção inválida.");
                 }
@@ -256,6 +268,31 @@ public class Main {
         cargas.remove(carga);
 
         Log.info("Ordem " + ordem.getNumero() + " criada. Próximo passo: alocar o veículo (opção 4).");
+    }
+
+    private static void alocarVeiculo() {
+        Entrega entrega = escolher("Escolha a entrega:", entregaService.listar());
+
+        if (entrega.getVeiculo() != null
+                && !lerSimNao("A entrega já tem o veículo " + entrega.getVeiculo() + ". Deseja substituir?")) {
+            Log.info("Alocação cancelada.");
+            return;
+        }
+
+        OperacaoTransporte operacao = escolher("Escolha a operação de transporte:", operacoes);
+
+        entregaService.alocarVeiculo(entrega, operacao);
+
+        Log.info("Próximos passos: rastrear o veículo (opção 5) ou atualizar o status (opção 6).");
+    }
+
+    private static void rastrearVeiculo() {
+        Entrega entrega = escolher("Escolha a entrega:", entregaService.listar());
+        Rastreador rastreador = escolher("Escolha o fornecedor de rastreamento:",
+                rastreamentoService.getRastreadores());
+
+        Posicao posicao = rastreamentoService.localizar(entrega, rastreador);
+        Log.info("Posição de " + entrega.getVeiculo().getPlaca() + ": " + posicao);
     }
 
     // ------------------------------------------------------------------

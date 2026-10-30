@@ -97,4 +97,15 @@ public class Entrega implements SujeitoEntrega {
     public EstadoEntrega getEstado() { return estado; }
     public List<String> getHistorico() { return Collections.unmodifiableList(historico); }
     public List<ObservadorEntrega> getObservadores() { return Collections.unmodifiableList(observadores); }
+
+    @Override
+    public String toString() {
+        return String.format("%s | %s | %s -> %s | %s | veículo: %s",
+                ordem.getNumero(),
+                ordem.getCliente().getNome(),
+                ordem.getOrigem(),
+                ordem.getDestino(),
+                estado.getNome(),
+                veiculo == null ? "não alocado" : veiculo);
+    }
 }

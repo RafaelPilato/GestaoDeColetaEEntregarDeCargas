@@ -103,4 +103,9 @@ public abstract class OperacaoTransporte {
         }
         throw new IllegalStateException("Não foi possível gerar uma placa diferente das já emitidas.");
     }
+
+    @Override
+    public String toString() {
+        return getNome();
+    }
 }

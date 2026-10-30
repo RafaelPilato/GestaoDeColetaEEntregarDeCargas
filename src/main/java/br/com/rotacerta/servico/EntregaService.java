@@ -54,9 +54,14 @@ public class EntregaService {
         Veiculo veiculo = operacao.alocar(entrega.getOrdem());
         double frete = calculadora.calcular(entrega.getOrdem(), veiculo);
 
+        if (entrega.getVeiculo() == null) {
+            Log.info("Veículo " + veiculo + " alocado na entrega " + entrega.getOrdem().getNumero() + ".");
+        } else {
+            Log.info("Veículo " + entrega.getVeiculo() + " substituído por " + veiculo
+                    + " na entrega " + entrega.getOrdem().getNumero() + ".");
+        }
         entrega.setVeiculo(veiculo);
         entrega.setValorFrete(frete);
-        Log.info("Veículo " + veiculo + " alocado na entrega " + entrega.getOrdem().getNumero() + ".");
     }
 
     public Entrega buscar(String numero) {
